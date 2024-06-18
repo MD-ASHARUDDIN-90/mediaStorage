@@ -1,13 +1,19 @@
 import {StyleSheet, View} from 'react-native';
 import React, {useEffect} from 'react';
 import {Text} from 'react-native-paper';
+import {useSelector} from 'react-redux';
 
 const SplashScreen = ({navigation}: any) => {
+  const {token} = useSelector((state: any) => state.auth);
   console.log('SplashScreen');
   useEffect(() => {
     setTimeout(() => {
       console.log('Timeout');
-      navigation.navigate('Login');
+      if (token) {
+        navigation.navigate('Home');
+      } else {
+        navigation.navigate('Login');
+      }
     }, 3000);
   }, []);
 

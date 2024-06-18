@@ -1,19 +1,23 @@
 import React, {useState} from 'react';
 import {View, StyleSheet, Alert, TouchableOpacity} from 'react-native';
 import {TextInput, Button, Text} from 'react-native-paper';
+import {login} from '../../utils/api';
+import {setToken} from '../../redux/reducers/authSlice';
+import {useDispatch} from 'react-redux';
 
 const Login = ({navigation}: {navigation: any}) => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const dispatch = useDispatch();
 
-  const validateEmail = email => {
+  const validateEmail = (email: string) => {
     const re = /\S+@\S+\.\S+/;
     return re.test(email);
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     let isValid = true;
 
     if (!validateEmail(email)) {
@@ -31,7 +35,14 @@ const Login = ({navigation}: {navigation: any}) => {
     }
 
     if (isValid) {
-      Alert.alert('Login Successful', 'Welcome to MediaStorage!');
+      try {
+        const response = await login(email, password);
+        dispatch(setToken(response.token));
+        navigation.navigate('Home');
+        Alert.alert('Login Successful', 'Welcome to MediaStorage!');
+      } catch (error: any) {
+        Alert.alert('Login Failed', error.message || 'Failed to login');
+      }
     }
   };
 
